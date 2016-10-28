@@ -1,0 +1,30 @@
+engines:
+  radon:
+    enabled: true
+
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - python
+  FIXME:
+    enabled: true
+
+ratings:
+  paths:
+  - pyconfig/
+
+exclude_paths:
+- examples/
+- tests/
+- tools/
+- "*.md"
+- "*.yml"
+- "*.ini"
+- Makefile
+- Dangerfile
+- Gemfile
+- LICENSE
+- contributing/
+- docs/
+- setup.py
