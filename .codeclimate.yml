@@ -21,6 +21,7 @@ exclude_paths:
 - "*.md"
 - "*.yml"
 - "*.ini"
+- "*.txt"
 - Makefile
 - Dangerfile
 - Gemfile
@@ -28,3 +29,4 @@ exclude_paths:
 - contributing/
 - docs/
 - setup.py
+- pylintrc
