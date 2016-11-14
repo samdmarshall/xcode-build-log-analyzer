@@ -1,0 +1,13 @@
+.DS_Store
+installed_files.txt
+build/
+dist/
+forester.egg-info/
+.tox/
+.coverage
+*.pyc
+__pycache__/
+htmlcov/
+.eggs/
+lint_output.txt
+*_output.plist

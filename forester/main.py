@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Copyright (c) 2016, Samantha Marshall (http://pewpewthespells.com)
 # All rights reserved.
 #
@@ -28,25 +29,58 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from setuptools import setup
+import sys
+import argparse
+from .version           import __version__ as FORESTER_VERSION
+from .Helpers.Logger    import Logger
 
-setup(
-    name = 'forester',
-    version = '0.1',
-    description = 'Tool for analyzing Xcode build logs',
-    url = 'https://github.com/samdmarshall/forester',
-    author = 'Samantha Marshall',
-    author_email = 'hello@pewpewthespells.com',
-    license = 'BSD 3-Clause',
-    packages = [ 
-        'forester',
-        'forester/Helpers',
-    ],
-    entry_points = { 
-        'console_scripts': [ 'forester = forester:main' ] 
-    },
-    test_suite = 'tests.forester_test',
-    zip_safe = False,
-    install_requires = [
-    ]
-)
+def main(argv=sys.argv[1:]):
+    parser = argparse.ArgumentParser(description='forester is a tool for parsing Xcode log files and getting more detailed information about a build')
+    parser.add_argument(
+        'file',
+        metavar='<log file>',
+        help='path to the log file from Xcode'
+    )
+    parser.add_argument(
+        '--version',
+        help='displays the version information',
+        action='version',
+        version=FORESTER_VERSION
+    )
+    parser.add_argument(
+        '--quiet',
+        help='Silences all logging output',
+        default=False,
+        action='store_true'
+    )
+    parser.add_argument(
+        '--verbose',
+        help='Adds verbosity to logging output',
+        default=False,
+        action='store_true'
+    )
+    parser.add_argument(
+        '--no-ansi',
+        help='Disables the ANSI color codes as part of the logger',
+        default=False,
+        action='store_true'
+    )
+    parser.add_argument(
+        '--debug',
+        help=argparse.SUPPRESS,
+        default=False,
+        action='store_true'
+    )
+    args = parser.parse_args(argv)
+
+    # perform the logging modifications before we do any other operations
+    Logger.disableANSI(args.no_ansi)
+    Logger.enableDebugLogger(args.debug)
+    Logger.isVerbose(args.verbose)
+    Logger.isSilent(args.quiet)
+
+    Logger.write().info('Processing file at path "%s"' % args.file)
+
+
+if __name__ == "__main__": #pragma: no cover
+    main()
