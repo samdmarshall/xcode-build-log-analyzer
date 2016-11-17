@@ -1,2 +1,2 @@
 remote_origin = 'git@github.com:samdmarshall/forester.git'
-commit_hash = 'c36f280'
+commit_hash = '015499b'

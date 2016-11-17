@@ -31,11 +31,12 @@
 
 from .basic          import BasicFormatter
 
-class TargetHeaderFormatter(BasicFormatter):
+class NoFormatter(BasicFormatter):
 
     def __init__(self) -> None:
-        self.name = 'Target Header Formatter'
-        self._match_string = r'^=== [A-Z]+ TARGET [a-zA-Z0-9_-]+ OF PROJECT [a-zA-Z0-9_-]+ .* ===$'
+        self.name = 'No Formatter'
+        self._match_string = r'^.*$'
 
     def print(self, lines) -> None:
-        print(lines[0])
+        for line in lines:
+            print(line)

@@ -32,22 +32,21 @@
 import os
 from ..Helpers.Logger     import Logger
 from .eval                import LineEvaluator
+from .formatters.none     import NoFormatter
 
 class Parser(object):
 
-    def __init__(self) -> None:
+    def __init__(self, file_path) -> None:
         self._lines = list()
-
-    def consume_log_file(self, file_path) -> None:
         if os.path.exists(file_path) is True:
             Logger.write().debug('Found a file at path "%s"' % file_path)
 
             Logger.write().debug('Opening log file...')
             file_descriptor = open(file_path, 'r')
-
+        
             Logger.write().debug('Reading log file...')
             self._lines = file_descriptor.read().splitlines()
-            
+                    
             Logger.write().debug('Closing log file...')
             file_descriptor.close()
         else:
@@ -55,41 +54,40 @@ class Parser(object):
 
     def parse(self) -> None:
         line_count = len(self._lines)
-        if line_count > 0:
-            Logger.write().debug('Starting LineEvaluator...')
-            eval = LineEvaluator()
+        line_matches = list()
+        if line_count == 0:
+            Logger.write().error('Log file appears to be empty!')
+            return
 
-            line_matches = list()
-            
-            Logger.write().info('Parsing log file...')
-            line_index = 0
-            while line_index < line_count:
-                Logger.write().info('Parsing line %i...' % line_index)
-                line_text = self._lines[line_index]
-                
-                Logger.write().debug('Parsing line: "%s"' % line_text)
-                formatter = eval.evaluate_line(line_index, self._lines)
-                if formatter is not None:
-                    line_matches.append((line_index, formatter))
-                line_index += 1
-            Logger.write().info('Grouping commands...')
-            line_groups = list()
+        evaluator = LineEvaluator()
+        Logger.write().info('Parsing log file...')
+        line_index = 0
+        while line_index < line_count:
+            line_text = self._lines[line_index]
+            Logger.write().debug('Parsing line %i: "%s"' % (line_index, line_text))
+            formatter = evaluator.evaluate_line(line_index, self._lines)
+            if formatter is not None:
+                line_matches.append((line_index, formatter))
+            line_index += 1
+
+        Logger.write().info('Grouping Commands...')
+        grouped_lines = list()
+        if len(line_matches) > 0:
             group_index = 0
             first_entry = line_matches[0]
-            line_groups.append((self._lines[:first_entry[0]], first_entry[1]))
+            if first_entry[0] > 0:
+                grouped_lines.append(((0,first_entry[0]), NoFormatter()))
             while group_index < (len(line_matches) - 1):
                 entry = line_matches[group_index]
                 next_entry = line_matches[group_index + 1]
-                line_groups.append((self._lines[entry[0]:next_entry[0]], entry[1]))
+                grouped_lines.append(((entry[0], next_entry[0]), entry[1]))
                 group_index += 1
             last_entry = line_matches[-1]
-            line_groups.append((self._lines[last_entry[0]:], last_entry[1]))
-            for grouping in line_groups:
-                grouped_lines, formatter = grouping
-                action = grouped_lines[0].split(' ')[0]
-                if len(action) > 0:
-                    Logger.write().critical('Action "%s" encountered' % action)
-                formatter.print(grouped_lines)
-                
-        else:
-            Logger.write().error('Log file appears to be empty!')
+            grouped_lines.append(((last_entry[0],len(line_matches)), last_entry[1]))
+
+        Logger.write().info('Formatting Lines...')
+        for grouping in grouped_lines:
+            indicies, formatter = grouping
+            start_index, end_index = indicies
+            formatter.print(self._lines[start_index:end_index])
+

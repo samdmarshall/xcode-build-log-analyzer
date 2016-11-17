@@ -101,17 +101,12 @@ def main(argv=sys.argv[1:]):
         sys.exit(1)
     else:
         Logger.write().info('Processing %s log file: %s' % (args.type, args.file))
-
-        log_parser = None
         for case in Switch(args.type):
             if case('xcode'):
-                log_parser = Xcode()
+                Xcode(args.file).parse()
                 break
             if case():
                 break
-
-        log_parser.consume_log_file(args.file)
-        log_parser.parse()
 
 if __name__ == "__main__": #pragma: no cover
     main()
