@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Copyright (c) 2016, Samantha Marshall (http://pewpewthespells.com)
 # All rights reserved.
 #
@@ -28,27 +29,19 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from setuptools import setup
+from .basic          import BasicFormatter
 
-setup(
-    name = 'forester',
-    version = '0.1',
-    description = 'Tool for analyzing Xcode build logs',
-    url = 'https://github.com/samdmarshall/forester',
-    author = 'Samantha Marshall',
-    author_email = 'hello@pewpewthespells.com',
-    license = 'BSD 3-Clause',
-    packages = [ 
-        'forester',
-        'forester/Helpers',
-        'forester/xcode',
-        'forester/xcode/formatters',
-    ],
-    entry_points = { 
-        'console_scripts': [ 'forester = forester:main' ] 
-    },
-    test_suite = 'tests.forester_test',
-    zip_safe = False,
-    install_requires = [
-    ]
-)
+class WarningFormatter(BasicFormatter):
+
+    def __init__(self) -> None:
+        self.name = 'Warning Formatter'
+        self._match_string = r'^.*warning\: .*\[\-W.*\]$'
+
+    def line_span(self, line_index, lines) -> int:
+        line_span_count = 1
+        next_line_text = lines[line_index + line_span_count]
+        while next_line_text.endswith('^') is False:
+            line_span_count += 1
+            next_line_text = lines[line_index + line_span_count]
+        line_span_count += 1
+        return line_span_count

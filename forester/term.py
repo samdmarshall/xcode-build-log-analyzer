@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Copyright (c) 2016, Samantha Marshall (http://pewpewthespells.com)
 # All rights reserved.
 #
@@ -28,27 +29,15 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from setuptools import setup
+import os
+import sys
+import locale
+import codecs
 
-setup(
-    name = 'forester',
-    version = '0.1',
-    description = 'Tool for analyzing Xcode build logs',
-    url = 'https://github.com/samdmarshall/forester',
-    author = 'Samantha Marshall',
-    author_email = 'hello@pewpewthespells.com',
-    license = 'BSD 3-Clause',
-    packages = [ 
-        'forester',
-        'forester/Helpers',
-        'forester/xcode',
-        'forester/xcode/formatters',
-    ],
-    entry_points = { 
-        'console_scripts': [ 'forester = forester:main' ] 
-    },
-    test_suite = 'tests.forester_test',
-    zip_safe = False,
-    install_requires = [
-    ]
-)
+def uses_suitable_locale() -> bool:
+    is_suitable_locale = True
+    if codecs.lookup(locale.getpreferredencoding()).name == 'ascii':
+        os.environ['LANG'] = 'en_US.UTF-8'
+        if codecs.lookup(locale.getpreferredencoding()).name == 'ascii':
+            is_suitable_locale = False
+    return is_suitable_locale

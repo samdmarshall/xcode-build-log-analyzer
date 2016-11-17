@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Copyright (c) 2016, Samantha Marshall (http://pewpewthespells.com)
 # All rights reserved.
 #
@@ -28,27 +29,19 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from setuptools import setup
+import shlex
+from .basic          import BasicFormatter
+from .command_parser import commandline_parser
+from .               import printer
 
-setup(
-    name = 'forester',
-    version = '0.1',
-    description = 'Tool for analyzing Xcode build logs',
-    url = 'https://github.com/samdmarshall/forester',
-    author = 'Samantha Marshall',
-    author_email = 'hello@pewpewthespells.com',
-    license = 'BSD 3-Clause',
-    packages = [ 
-        'forester',
-        'forester/Helpers',
-        'forester/xcode',
-        'forester/xcode/formatters',
-    ],
-    entry_points = { 
-        'console_scripts': [ 'forester = forester:main' ] 
-    },
-    test_suite = 'tests.forester_test',
-    zip_safe = False,
-    install_requires = [
-    ]
-)
+class CpHeaderFormatter(BasicFormatter):
+
+    def __init__(self) -> None:
+        self.name = 'Copy Header Formatter'
+        self._match_string = r'^CpHeader .*$'
+
+    def print(self, lines) -> None:
+        _, source_header_file_path, final_header_file_path = shlex.split(lines[0])
+        indent_length = printer.PrintAction('Copying Header', source_header_file_path)
+        printer.PrintIndent(indent_length, '↳ '+final_header_file_path)
+        print('')

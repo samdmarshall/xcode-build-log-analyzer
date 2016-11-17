@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Copyright (c) 2016, Samantha Marshall (http://pewpewthespells.com)
 # All rights reserved.
 #
@@ -28,27 +29,9 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from setuptools import setup
+def PrintAction(action_string, thing_string) -> int:
+    print('%s: %s' % (action_string, thing_string))
+    return len(action_string) + 2
 
-setup(
-    name = 'forester',
-    version = '0.1',
-    description = 'Tool for analyzing Xcode build logs',
-    url = 'https://github.com/samdmarshall/forester',
-    author = 'Samantha Marshall',
-    author_email = 'hello@pewpewthespells.com',
-    license = 'BSD 3-Clause',
-    packages = [ 
-        'forester',
-        'forester/Helpers',
-        'forester/xcode',
-        'forester/xcode/formatters',
-    ],
-    entry_points = { 
-        'console_scripts': [ 'forester = forester:main' ] 
-    },
-    test_suite = 'tests.forester_test',
-    zip_safe = False,
-    install_requires = [
-    ]
-)
+def PrintIndent(indent_length, line_text) -> None:
+    print('%s%s' % (indent_length*' ', line_text))

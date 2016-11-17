@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Copyright (c) 2016, Samantha Marshall (http://pewpewthespells.com)
 # All rights reserved.
 #
@@ -28,27 +29,24 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from setuptools import setup
+import shlex
 
-setup(
-    name = 'forester',
-    version = '0.1',
-    description = 'Tool for analyzing Xcode build logs',
-    url = 'https://github.com/samdmarshall/forester',
-    author = 'Samantha Marshall',
-    author_email = 'hello@pewpewthespells.com',
-    license = 'BSD 3-Clause',
-    packages = [ 
-        'forester',
-        'forester/Helpers',
-        'forester/xcode',
-        'forester/xcode/formatters',
-    ],
-    entry_points = { 
-        'console_scripts': [ 'forester = forester:main' ] 
-    },
-    test_suite = 'tests.forester_test',
-    zip_safe = False,
-    install_requires = [
-    ]
-)
+stand_alone_flags = ['-W', '-f', '-O', '-D', '-std', '-m', '-g', '-I', '-l', '-F']
+
+def commandline_parser(line_text) -> list:
+    first_pass = shlex.split(line_text)
+    grouped_arguments = list()
+    item_index = 0
+    while item_index < len(first_pass):
+        current_item = first_pass[item_index]
+        check_prefixes = [current_item.startswith(prefix) for prefix in stand_alone_flags]
+        if current_item.startswith('-') and not True in check_prefixes:
+            offset = item_index
+            while current_item.startswith('-') and item_index < len(first_pass):
+                item_index += 1
+                current_item = first_pass[item_index]
+            grouped_arguments.append(first_pass[offset:item_index+1])
+        else:
+            grouped_arguments.append(current_item)
+        item_index += 1
+    return grouped_arguments

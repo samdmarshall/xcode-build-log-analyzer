@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Copyright (c) 2016, Samantha Marshall (http://pewpewthespells.com)
 # All rights reserved.
 #
@@ -28,27 +29,28 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from setuptools import setup
+import re
 
-setup(
-    name = 'forester',
-    version = '0.1',
-    description = 'Tool for analyzing Xcode build logs',
-    url = 'https://github.com/samdmarshall/forester',
-    author = 'Samantha Marshall',
-    author_email = 'hello@pewpewthespells.com',
-    license = 'BSD 3-Clause',
-    packages = [ 
-        'forester',
-        'forester/Helpers',
-        'forester/xcode',
-        'forester/xcode/formatters',
-    ],
-    entry_points = { 
-        'console_scripts': [ 'forester = forester:main' ] 
-    },
-    test_suite = 'tests.forester_test',
-    zip_safe = False,
-    install_requires = [
-    ]
-)
+class BasicFormatter(object):
+
+    def __init__(self) -> None:
+        self.name = 'Basic Formatter'
+        self._match_string = r'^[A-Z].*$'
+
+    def found_match(self, line_text) -> bool:
+        result = re.search(self._match_string, line_text)
+        if result is not None:
+            return re.search(self._match_string, line_text).group(0) == line_text
+        return False
+
+    def line_span(self, line_index, lines) -> int:
+        line_span_count = 1
+        if line_index + line_span_count < len(lines):
+            next_line_text = lines[line_index + line_span_count]
+            while next_line_text.startswith('    ') is True:
+                line_span_count += 1
+                next_line_text = lines[line_index + line_span_count]
+        return line_span_count
+
+    def print(self, lines) -> None:
+        pass

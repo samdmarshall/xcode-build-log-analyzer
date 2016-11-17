@@ -29,10 +29,15 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import os
 import sys
 import argparse
 from .version           import __version__ as FORESTER_VERSION
 from .Helpers.Logger    import Logger
+from .Helpers.Switch    import Switch
+from .                  import term
+
+from .xcode.parser      import Parser as Xcode
 
 def main(argv=sys.argv[1:]):
     parser = argparse.ArgumentParser(description='forester is a tool for parsing Xcode log files and getting more detailed information about a build')
@@ -71,6 +76,17 @@ def main(argv=sys.argv[1:]):
         default=False,
         action='store_true'
     )
+    # -------------------------------------------------------------------------
+    # Flags for various types of build logs
+    # -------------------------------------------------------------------------
+    parser.add_argument(
+        '--type',
+        help='Specify the type of log file that is given',
+        choices=['xcode'],
+        required=True,
+    )
+    
+    
     args = parser.parse_args(argv)
 
     # perform the logging modifications before we do any other operations
@@ -79,8 +95,23 @@ def main(argv=sys.argv[1:]):
     Logger.isVerbose(args.verbose)
     Logger.isSilent(args.quiet)
 
-    Logger.write().info('Processing file at path "%s"' % args.file)
+    # verify that this is being run in a UTF-8 supported environment
+    if term.uses_suitable_locale() is False:
+        Logger.write().error('Environment could not be configured to support UTF-8, exiting!')
+        sys.exit(1)
+    else:
+        Logger.write().info('Processing %s log file: %s' % (args.type, args.file))
 
+        log_parser = None
+        for case in Switch(args.type):
+            if case('xcode'):
+                log_parser = Xcode()
+                break
+            if case():
+                break
+
+        log_parser.consume_log_file(args.file)
+        log_parser.parse()
 
 if __name__ == "__main__": #pragma: no cover
     main()
