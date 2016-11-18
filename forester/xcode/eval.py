@@ -49,14 +49,14 @@ class LineEvaluator(object):
         self._formatters = set()
         self._formatters.add(EmptyLineFormatter())
         self._formatters.add(TargetHeaderFormatter())
-#        self._formatters.add(CompileFormatter())
-#        self._formatters.add(SymlinkFormatter())
-#        self._formatters.add(CpHeaderFormatter())
-#        self._formatters.add(PBXCpFormatter())
-#        self._formatters.add(CodeSignFormatter())
-#        self._formatters.add(TouchFormatter())
-#        self._formatters.add(ValidateFormatter())
-#        self._formatters.add(DependencyActionFormatter())
+        self._formatters.add(CompileFormatter())
+        self._formatters.add(SymlinkFormatter())
+        self._formatters.add(CpHeaderFormatter())
+        self._formatters.add(PBXCpFormatter())
+        self._formatters.add(CodeSignFormatter())
+        self._formatters.add(TouchFormatter())
+        self._formatters.add(ValidateFormatter())
+        self._formatters.add(DependencyActionFormatter())
 
     def evaluate_line(self, line_index, lines) -> object:
         line_text = lines[line_index]

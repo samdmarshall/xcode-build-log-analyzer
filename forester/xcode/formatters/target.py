@@ -29,7 +29,10 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from .basic          import BasicFormatter
+import re
+import shutil
+from .basic         import BasicFormatter
+from .              import printer
 
 class TargetHeaderFormatter(BasicFormatter):
 
@@ -38,4 +41,29 @@ class TargetHeaderFormatter(BasicFormatter):
         self._match_string = r'^=== [A-Z]+ TARGET [a-zA-Z0-9_-]+ OF PROJECT [a-zA-Z0-9_-]+ .* ===$'
 
     def print(self, lines) -> None:
-        print(lines[0])
+        output = lines[0].strip('=== ')
+
+        action = None
+        target = None
+        project = None
+        configuration = None
+
+        result = re.search('^(.+?) TARGET ', output)
+        if result is not None:
+            action = result.group(1)
+        result = re.search(' TARGET (.+?) OF ', output)
+        if result is not None:
+            target = result.group(1)
+        result = re.search(' PROJECT (.+?) WITH ', output)
+        if result is not None:
+            project = result.group(1)
+        result = re.search(' CONFIGURATION (.+?)$', output)
+        if result is not None:
+            configuration = result.group(1)
+
+        print('-'*shutil.get_terminal_size().columns)
+        printer.PrintAction('Xcode Action', action)
+        printer.PrintIndent(2, 'Project: '+project)
+        printer.PrintIndent(2, 'Target: '+target)
+        printer.PrintIndent(2, 'Configuration: '+configuration)
+        print('')
