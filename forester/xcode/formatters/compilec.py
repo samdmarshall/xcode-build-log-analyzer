@@ -29,6 +29,7 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import os
 import shlex
 from .basic          import BasicFormatter
 from .command_parser import commandline_parser
@@ -71,6 +72,13 @@ class CompileFormatter(BasicFormatter):
         export_lang = lines[2]
         export_path = lines[3]
         compile_line = commandline_parser(lines[4])
-        indent_length = printer.PrintAction('Compiling', source_file_path)
+        indent_length = printer.PrintAction('Compiling', os.path.basename(source_file_path))
         printer.PrintIndent(indent_length, '↳ '+obj_file_path)
+        printer.PrintIndent(indent_length, 'Flags:')
+        flag_indent = indent_length + len('Flags:')
+        for flag_group in compile_line[1:]:
+            if type(flag_group) is not str:
+                printer.PrintIndent(flag_indent, ' '.join(flag_group))
+            else:
+                printer.PrintIndent(flag_indent, flag_group)
         print('')

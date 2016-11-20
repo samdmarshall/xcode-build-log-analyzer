@@ -31,7 +31,7 @@
 
 import shlex
 
-stand_alone_flags = ['-W', '-f', '-O', '-D', '-std', '-m', '-g', '-I', '-l', '-F']
+stand_alone_flags = ['-W', '-f', '-O', '-D', '-std', '-m', '-g', '-I', '-l', '-F', '-MMD']
 
 def commandline_parser(line_text) -> list:
     first_pass = shlex.split(line_text)
